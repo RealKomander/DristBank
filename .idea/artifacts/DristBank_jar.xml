@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="DristBank:jar">
+    <output-path>$USER_HOME$/Desktop</output-path>
+    <root id="archive" name="DristBank.jar">
+      <element id="module-output" name="DristBank" />
+    </root>
+  </artifact>
+</component>
