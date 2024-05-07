@@ -70,11 +70,6 @@ public class Take implements CommandExecutor {
             return true;
         }
 
-        if (amount <= 0) {
-            player.sendMessage(messageManager.getMessage("invalid-amount"));
-            return true;
-        }
-
         itemGive(player, (int) amount, Material.ANCIENT_DEBRIS);
 
         configManager.getConfig().set("player-info." + player.getUniqueId(), balance - amount);
