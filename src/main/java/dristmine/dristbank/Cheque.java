@@ -53,7 +53,7 @@ public class Cheque implements CommandExecutor {
         } catch (NumberFormatException e) {
             args[0] = args[0].toLowerCase();
 
-            if (!args[0].equals("all")) {
+            if (!args[0].equals(Utils.MAX_AMOUNT_COMMAND)) {
                 player.sendMessage(messageManager.getMessage("invalid-amount"));
                 return true;
             }
