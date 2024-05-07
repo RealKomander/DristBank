@@ -46,12 +46,19 @@ public class Cheque implements CommandExecutor {
             return true;
         }
 
+        double balance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
         double amount;
         try {
             amount = Double.parseDouble(args[0]);
         } catch (NumberFormatException e) {
-            player.sendMessage(messageManager.getMessage("invalid-amount"));
-            return true;
+            args[0] = args[0].toLowerCase();
+
+            if (!args[0].equals("all")) {
+                player.sendMessage(messageManager.getMessage("invalid-amount"));
+                return true;
+            }
+
+            amount = balance;
         }
 
         if (amount <= 0) {
@@ -60,7 +67,6 @@ public class Cheque implements CommandExecutor {
         }
 
         if (!player.hasPermission("dristbank.admin")) {
-            double balance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
             if (balance < amount) {
                 player.sendMessage(messageManager.getMessage("insufficient-balance", balance));
                 return true;
@@ -69,7 +75,7 @@ public class Cheque implements CommandExecutor {
             configManager.getConfig().set("player-info." + player.getUniqueId(), balance - amount);
             configManager.saveConfig();
         } else if (player.hasPermission("dristbank.admin")) {
-            double balance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
+            balance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
             configManager.getConfig().set("player-info." + player.getUniqueId(), balance - amount);
             configManager.saveConfig();
         }
