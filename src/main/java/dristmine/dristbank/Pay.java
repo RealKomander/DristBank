@@ -66,7 +66,7 @@ public class Pay implements CommandExecutor {
             player.sendMessage(messageManager.getMessage("positive-amount"));
             return true;
         }
-        
+
         if (!player.hasPermission("dristbank.admin") && balance < amount) {
             player.sendMessage(messageManager.getMessage("insufficient-balance", balance));
             return true;
