@@ -38,20 +38,25 @@ public class Take implements CommandExecutor {
             return true;
         }
 
+        double balance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
         double amount;
         try {
             amount = Double.parseDouble(args[0]);
         } catch (NumberFormatException e) {
-            player.sendMessage(messageManager.getMessage("invalid-amount"));
-            return true;
+            args[0] = args[0].toLowerCase();
+
+            if (!args[0].equals("all")) {
+                player.sendMessage(messageManager.getMessage("invalid-amount"));
+                return true;
+            }
+
+            amount = balance;
         }
 
         if (amount <= 0) {
             player.sendMessage(messageManager.getMessage("positive-amount"));
             return true;
         }
-
-        double balance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
 
         if (!player.hasPermission("dristbank.admin") && balance < amount) {
             player.sendMessage(messageManager.getMessage("insufficient-balance", balance));
