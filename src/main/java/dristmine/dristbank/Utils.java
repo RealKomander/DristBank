@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class Utils {
-    public static final String MAX_AMOUNT_COMMAND = "all";
+    public static final String MAX_AMOUNT_ARG = "all";
 
     public static void itemGive(Player player, int amount, Material material) {
         // Drop items in groups of 64 until the remaining amount is less than 64

@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,9 +50,7 @@ public class Cheque implements CommandExecutor {
         try {
             amount = Double.parseDouble(args[0]);
         } catch (NumberFormatException e) {
-            args[0] = args[0].toLowerCase();
-
-            if (!args[0].equals(Utils.MAX_AMOUNT_COMMAND)) {
+            if (!args[0].equalsIgnoreCase(Utils.MAX_AMOUNT_ARG)) {
                 player.sendMessage(messageManager.getMessage("invalid-amount"));
                 return true;
             }

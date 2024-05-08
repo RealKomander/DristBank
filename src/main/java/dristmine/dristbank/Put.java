@@ -54,7 +54,7 @@ public class Put implements CommandExecutor {
             // Remove ancient debris from player's hand
             itemInHand.setAmount(0);
             player.getInventory().setItemInMainHand(itemInHand);
-        } else if (args[0].toLowerCase().equals(Utils.MAX_AMOUNT_COMMAND)) {
+        } else if (args[0].equalsIgnoreCase(Utils.MAX_AMOUNT_ARG)) {
             amount = 0;
 
             for (ItemStack itemStack: player.getInventory()) {

@@ -52,9 +52,7 @@ public class Pay implements CommandExecutor {
         try {
             amount = Double.parseDouble(args[1]);
         } catch (NumberFormatException e) {
-            args[1] = args[1].toLowerCase();
-
-            if (!args[1].equals(Utils.MAX_AMOUNT_COMMAND)) {
+            if (!args[1].equalsIgnoreCase(Utils.MAX_AMOUNT_ARG)) {
                 player.sendMessage(messageManager.getMessage("invalid-amount"));
                 return true;
             }
