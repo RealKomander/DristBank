@@ -40,7 +40,7 @@ public class Put implements CommandExecutor {
         }
 
         int amount;
-        if (args[0] == null)
+        if (args.length == 0)
         {
             ItemStack itemInHand = player.getInventory().getItemInMainHand();
 
@@ -48,6 +48,7 @@ public class Put implements CommandExecutor {
 
             if (amount == -1)
             {
+                player.sendMessage(messageManager.getMessage("put-invalid-item"));
                 return true;
             }
 
@@ -103,7 +104,6 @@ public class Put implements CommandExecutor {
             result = itemStack.getAmount() * 36;
             itemGive(player, result, Material.GOLD_INGOT);
         } else {
-            player.sendMessage(messageManager.getMessage("put-invalid-item"));
             return -1;
         }
 
