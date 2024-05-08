@@ -63,11 +63,11 @@ public class Put implements CommandExecutor {
                 }
 
                 int tempAmount = calculateAmount(itemStack, player);
-                if (tempAmount == -1) {
-                    tempAmount = 0;
-                }
+                if (tempAmount != -1) {
+                    amount += tempAmount;
 
-                amount += tempAmount;
+                    itemStack.setAmount(0);
+                }
             }
         } else {
             player.sendMessage(messageManager.getMessage("put-usage"));
