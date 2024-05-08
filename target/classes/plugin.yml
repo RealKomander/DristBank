@@ -1,0 +1,35 @@
+name: DristBank
+version: '1.20.4'
+main: dristmine.dristbank.DristBank
+api-version: '1.20'
+description: A Bukkit plugin for implementing a banking system based on Ancient Debris.
+
+commands:
+  put:
+    description: Deposit ancient debris into your account
+    usage: /put |all
+  take:
+    description: Withdraw ancient debris from your account
+    usage: /take <amount>|all
+  pay:
+    description: Transfer ancient debris to another player
+    usage: /pay <player> <amount>|all
+  balance:
+    description: Check your balance
+    usage: /balance
+  interest:
+    description: Set monthly interest rate (Admin only)
+    usage: /interest <percentage>
+  reserves:
+    description: Check total reserves of ancient debris in the system (Admin only)
+    usage: /reserves
+  payinterest:
+    description: Pay monthly interest to all players (Admin only)
+    usage: /payinterest
+  bank:
+    description: Display current interest rate and explain public commands
+    usage: /bank
+  cheque:
+    description: Give a player a cheque
+    usage: /cheque <amount>|all
+    aliases: [chk]
