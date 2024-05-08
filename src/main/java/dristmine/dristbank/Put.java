@@ -39,7 +39,7 @@ public class Put implements CommandExecutor {
             return true;
         }
 
-        int amount;
+        int amount = 0;
         if (args.length == 0)
         {
             ItemStack itemInHand = player.getInventory().getItemInMainHand();
@@ -56,8 +56,6 @@ public class Put implements CommandExecutor {
             itemInHand.setAmount(0);
             player.getInventory().setItemInMainHand(itemInHand);
         } else if (args[0].equalsIgnoreCase(Utils.MAX_AMOUNT_ARG)) {
-            amount = 0;
-
             for (ItemStack itemStack: player.getInventory()) {
                 if (itemStack == null) {
                     continue;
@@ -72,6 +70,11 @@ public class Put implements CommandExecutor {
             }
         } else {
             player.sendMessage(messageManager.getMessage("put-usage"));
+            return true;
+        }
+
+        if (amount <= 0) {
+            player.sendMessage(messageManager.getMessage("positive-amount"));
             return true;
         }
 
