@@ -18,4 +18,12 @@ public class Utils {
             amount -= stackSize; // Subtract dropped items from the total amount
         }
     }
+
+    public static double getBalance(Player target, ConfigManager configManager) {
+        return configManager.getConfig().getDouble("player-info." + target.getUniqueId(), 0);
+    }
+
+    public static void setBalance(Player target, double amount, ConfigManager configManager) {
+        configManager.getConfig().set("player-info." + target.getUniqueId(), amount);
+    }
 }
