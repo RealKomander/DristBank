@@ -27,6 +27,7 @@ public class DristBank extends JavaPlugin implements Listener {
         getCommand("payinterest").setExecutor(new Interest(this, configManager, messageManager));
         getCommand("bank").setExecutor(new Bank(this, configManager, messageManager));
         getCommand("cheque").setExecutor(new Cheque(this, configManager, messageManager));
+        getCommand("dbank").setExecutor(new DBank(this, configManager, messageManager));
 
         // Register listener
         getServer().getPluginManager().registerEvents(new ChequeListener(this, configManager, messageManager), this);
