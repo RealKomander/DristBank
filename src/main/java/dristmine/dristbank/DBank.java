@@ -4,6 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.slf4j.helpers.Util;
 
 public class DBank implements CommandExecutor {
 	private final DristBank plugin;
@@ -58,7 +59,7 @@ public class DBank implements CommandExecutor {
 					return true;
 				}
 
-				return subtractMax(target);
+				amount = Utils.getBalance(target, configManager);
 			}
 
 			if (amount <= 0) {
@@ -90,7 +91,7 @@ public class DBank implements CommandExecutor {
 					return true;
 				}
 
-				return transferMax(source, target);
+				amount = Utils.getBalance(source, configManager);
 			}
 
 			if (amount <= 0) {
@@ -116,10 +117,6 @@ public class DBank implements CommandExecutor {
 		return true;
 	}
 
-	private boolean subtractMax(Player target) {
-		return subtract(target, Utils.getBalance(target, configManager));
-	}
-
 	private boolean transfer(Player source, Player target, double amount) {
 		double sourceBalance = Utils.getBalance(source, configManager);
 		double targetBalance = Utils.getBalance(target, configManager);
@@ -130,9 +127,5 @@ public class DBank implements CommandExecutor {
 		configManager.saveConfig();
 
 		return true;
-	}
-
-	private boolean transferMax(Player source, Player target) {
-		return transfer(source, target, Utils.getBalance(source, configManager));
 	}
 }
