@@ -34,26 +34,47 @@ public class Put implements CommandExecutor {
             return true;
         }
 
-        if (args.length != 0) {
+        if (args.length > 1) {
             player.sendMessage(messageManager.getMessage("put-usage"));
             return true;
         }
 
-        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+        int amount = 0;
+        if (args.length == 0)
+        {
+            ItemStack itemInHand = player.getInventory().getItemInMainHand();
 
-        int amount;
-        if (itemInHand.getType() == Material.ANCIENT_DEBRIS) {
-            amount = itemInHand.getAmount();
-        } else if (itemInHand.getType() == Material.NETHERITE_SCRAP) {
-            amount = itemInHand.getAmount();
-        } else if (itemInHand.getType() == Material.NETHERITE_INGOT) {
-            amount = itemInHand.getAmount() * 4;
-            itemGive(player, amount, Material.GOLD_INGOT);
-        } else if (itemInHand.getType() == Material.NETHERITE_BLOCK) {
-            amount = itemInHand.getAmount() * 36;
-            itemGive(player, amount, Material.GOLD_INGOT);
+            amount = calculateAmount(itemInHand, player);
+
+            if (amount == -1)
+            {
+                player.sendMessage(messageManager.getMessage("put-invalid-item"));
+                return true;
+            }
+
+            // Remove ancient debris from player's hand
+            itemInHand.setAmount(0);
+            player.getInventory().setItemInMainHand(itemInHand);
+        } else if (args[0].equalsIgnoreCase(Utils.MAX_AMOUNT_ARG)) {
+            for (ItemStack itemStack: player.getInventory()) {
+                if (itemStack == null) {
+                    continue;
+                }
+
+                int tempAmount = calculateAmount(itemStack, player);
+                if (tempAmount != -1) {
+                    amount += tempAmount;
+
+                    itemStack.setAmount(0);
+                }
+            }
         } else {
-            player.sendMessage(messageManager.getMessage("put-invalid-item"));
+            player.sendMessage(messageManager.getMessage("put-usage"));
+            return true;
+        }
+
+        if (amount <= 0) {
+            player.sendMessage(messageManager.getMessage("positive-amount"));
             return true;
         }
 
@@ -61,10 +82,6 @@ public class Put implements CommandExecutor {
         double balance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
         configManager.getConfig().set("player-info." + player.getUniqueId(), balance + amount);
         configManager.saveConfig();
-
-        // Remove ancient debris from player's hand
-        itemInHand.setAmount(0);
-        player.getInventory().setItemInMainHand(itemInHand);
 
         // Update total physical debris stored in the system
         int totalDebris = configManager.getConfig().getInt("total_debris", 0);
@@ -74,5 +91,25 @@ public class Put implements CommandExecutor {
         player.sendMessage(messageManager.getMessage("put-success", amount, balance + amount));
 
         return true;
+    }
+
+    private int calculateAmount(ItemStack itemStack, Player player) {
+        int result;
+
+        if (itemStack.getType() == Material.ANCIENT_DEBRIS) {
+            result = itemStack.getAmount();
+        } else if (itemStack.getType() == Material.NETHERITE_SCRAP) {
+            result = itemStack.getAmount();
+        } else if (itemStack.getType() == Material.NETHERITE_INGOT) {
+            result = itemStack.getAmount() * 4;
+            itemGive(player, result, Material.GOLD_INGOT);
+        } else if (itemStack.getType() == Material.NETHERITE_BLOCK) {
+            result = itemStack.getAmount() * 36;
+            itemGive(player, result, Material.GOLD_INGOT);
+        } else {
+            return -1;
+        }
+
+        return result;
     }
 }

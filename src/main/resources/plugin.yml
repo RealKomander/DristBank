@@ -7,13 +7,13 @@ description: A Bukkit plugin for implementing a banking system based on Ancient 
 commands:
   put:
     description: Deposit ancient debris into your account
-    usage: /put
+    usage: /put (all)
   take:
     description: Withdraw ancient debris from your account
-    usage: /take <amount>
+    usage: /take <amount>(all)
   pay:
     description: Transfer ancient debris to another player
-    usage: /pay <player> <amount>
+    usage: /pay <player> <amount>(all)
   balance:
     description: Check your balance
     usage: /balance
@@ -31,5 +31,5 @@ commands:
     usage: /bank
   cheque:
     description: Give a player a cheque
-    usage: /cheque <amount>
+    usage: /cheque <amount>(all)
     aliases: [chk]

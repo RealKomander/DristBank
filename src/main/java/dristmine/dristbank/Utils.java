@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class Utils {
+    public static final String MAX_AMOUNT_ARG = "all";
 
     public static void itemGive(Player player, int amount, Material material) {
         // Drop items in groups of 64 until the remaining amount is less than 64
@@ -16,5 +17,13 @@ public class Utils {
             itemEntity.setPickupDelay(0); // Set pickup delay
             amount -= stackSize; // Subtract dropped items from the total amount
         }
+    }
+
+    public static double getBalance(Player target, ConfigManager configManager) {
+        return configManager.getConfig().getDouble("player-info." + target.getUniqueId(), 0);
+    }
+
+    public static void setBalance(Player target, double amount, ConfigManager configManager) {
+        configManager.getConfig().set("player-info." + target.getUniqueId(), amount);
     }
 }

@@ -47,20 +47,23 @@ public class Pay implements CommandExecutor {
             return true;
         }
 
+        double balance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
         double amount;
         try {
             amount = Double.parseDouble(args[1]);
         } catch (NumberFormatException e) {
-            player.sendMessage(messageManager.getMessage("invalid-amount"));
-            return true;
+            if (!args[1].equalsIgnoreCase(Utils.MAX_AMOUNT_ARG)) {
+                player.sendMessage(messageManager.getMessage("invalid-amount"));
+                return true;
+            }
+
+            amount = balance;
         }
 
         if (amount <= 0) {
             player.sendMessage(messageManager.getMessage("positive-amount"));
             return true;
         }
-
-        double balance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
 
         if (!player.hasPermission("dristbank.admin") && balance < amount) {
             player.sendMessage(messageManager.getMessage("insufficient-balance", balance));
