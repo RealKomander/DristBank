@@ -7,17 +7,17 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import static dristmine.dristbank.Utils.itemGive;
-
 public class Put implements CommandExecutor {
     private final DristBank plugin;
     private final ConfigManager configManager;
     private final MessageManager messageManager;
+    private final StorageManager storageManager;
 
-    public Put(DristBank plugin, ConfigManager configManager, MessageManager messageManager) {
+    public Put(DristBank plugin, ConfigManager configManager, MessageManager messageManager, StorageManager storageManager) {
         this.plugin = plugin;
         this.configManager = configManager;
         this.messageManager = messageManager;
+        this.storageManager = storageManager;
     }
 
     @Override
@@ -40,14 +40,11 @@ public class Put implements CommandExecutor {
         }
 
         int amount = 0;
-        if (args.length == 0)
-        {
+        if (args.length == 0) {
             ItemStack itemInHand = player.getInventory().getItemInMainHand();
-
             amount = calculateAmount(itemInHand, player);
 
-            if (amount == -1)
-            {
+            if (amount == -1) {
                 player.sendMessage(messageManager.getMessage("put-invalid-item"));
                 return true;
             }
@@ -56,7 +53,7 @@ public class Put implements CommandExecutor {
             itemInHand.setAmount(0);
             player.getInventory().setItemInMainHand(itemInHand);
         } else if (args[0].equalsIgnoreCase(Utils.MAX_AMOUNT_ARG)) {
-            for (ItemStack itemStack: player.getInventory()) {
+            for (ItemStack itemStack : player.getInventory().getContents()) {
                 if (itemStack == null) {
                     continue;
                 }
@@ -79,14 +76,12 @@ public class Put implements CommandExecutor {
         }
 
         // Add amount to player's bank account
-        double balance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
-        configManager.getConfig().set("player-info." + player.getUniqueId(), balance + amount);
-        configManager.saveConfig();
+        double balance = storageManager.getBalance(player.getUniqueId().toString());
+        storageManager.updateBalance(player.getUniqueId().toString(), balance + amount);
 
         // Update total physical debris stored in the system
-        int totalDebris = configManager.getConfig().getInt("total_debris", 0);
-        configManager.getConfig().set("total_debris", totalDebris + amount);
-        configManager.saveConfig();
+        int totalDebris = (int) storageManager.getTotalDebris();
+        storageManager.updateTotalDebris(totalDebris + amount);
 
         player.sendMessage(messageManager.getMessage("put-success", amount, balance + amount));
 
@@ -102,10 +97,10 @@ public class Put implements CommandExecutor {
             result = itemStack.getAmount();
         } else if (itemStack.getType() == Material.NETHERITE_INGOT) {
             result = itemStack.getAmount() * 4;
-            itemGive(player, result, Material.GOLD_INGOT);
+            Utils.itemGive(player, result, Material.GOLD_INGOT);
         } else if (itemStack.getType() == Material.NETHERITE_BLOCK) {
             result = itemStack.getAmount() * 36;
-            itemGive(player, result, Material.GOLD_INGOT);
+            Utils.itemGive(player, result, Material.GOLD_INGOT);
         } else {
             return -1;
         }

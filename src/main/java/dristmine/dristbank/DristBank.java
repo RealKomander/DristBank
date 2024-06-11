@@ -10,6 +10,7 @@ import java.time.LocalDate;
 public class DristBank extends JavaPlugin implements Listener {
     private ConfigManager configManager;
     private MessageManager messageManager;
+    private StorageManager storageManager;
 
     @Override
     public void onEnable() {
@@ -17,20 +18,23 @@ public class DristBank extends JavaPlugin implements Listener {
         configManager.setupConfig();
         messageManager = new MessageManager(this);
 
+        storageManager = new StorageManager(this);
+        storageManager.migrateDataFromConfig(configManager);
+
         // Register commands
-        getCommand("put").setExecutor(new Put(this, configManager, messageManager));
-        getCommand("take").setExecutor(new Take(this, configManager, messageManager));
-        getCommand("pay").setExecutor(new Pay(this, configManager, messageManager));
-        getCommand("balance").setExecutor(new Balance(this, configManager, messageManager));
+        getCommand("put").setExecutor(new Put(this, configManager, messageManager, storageManager));
+        getCommand("take").setExecutor(new Take(this, messageManager, storageManager));
+        getCommand("pay").setExecutor(new Pay(this, configManager, messageManager, storageManager));
+        getCommand("balance").setExecutor(new Balance(this, storageManager, messageManager));
         getCommand("interest").setExecutor(new SetInterest(this, configManager, messageManager));
-        getCommand("reserves").setExecutor(new Reserves(this, configManager, messageManager));
-        getCommand("payinterest").setExecutor(new Interest(this, configManager, messageManager));
+        getCommand("reserves").setExecutor(new Reserves(this, storageManager, messageManager));
+        getCommand("payinterest").setExecutor(new Interest(this, configManager, messageManager, storageManager));
         getCommand("bank").setExecutor(new Bank(this, configManager, messageManager));
-        getCommand("cheque").setExecutor(new Cheque(this, configManager, messageManager));
-        getCommand("dbank").setExecutor(new DBank(this, configManager, messageManager));
+        getCommand("cheque").setExecutor(new Cheque(this, storageManager, messageManager));
+        getCommand("dbank").setExecutor(new DBank(this, storageManager, messageManager));
 
         // Register listener
-        getServer().getPluginManager().registerEvents(new ChequeListener(this, configManager, messageManager), this);
+        getServer().getPluginManager().registerEvents(new ChequeListener(this, storageManager, messageManager), this);
 
         // Check and pay interest if new month
         checkAndPayInterest();
@@ -43,7 +47,7 @@ public class DristBank extends JavaPlugin implements Listener {
             Bank bankCommand = new Bank(this, configManager, messageManager);
             return bankCommand.onCommand(sender, command, label, args);
         } else if (command.getName().equalsIgnoreCase("payinterest")) {
-            Interest interestCommand = new Interest(this, configManager, messageManager);
+            Interest interestCommand = new Interest(this, configManager, messageManager, storageManager);
             return interestCommand.onCommand(sender, command, label, args);
         }
         return false;
@@ -55,7 +59,7 @@ public class DristBank extends JavaPlugin implements Listener {
         int lastPaidMonth = configManager.getConfig().getInt("last_month_paid_interest", 0);
 
         if (currentMonth != lastPaidMonth) {
-            Interest interestHandler = new Interest(this, configManager, messageManager);
+            Interest interestHandler = new Interest(this, configManager, messageManager, storageManager);
             interestHandler.payInterest();
 
             // Update last month paid interest in config

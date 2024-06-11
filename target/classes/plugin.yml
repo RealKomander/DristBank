@@ -33,3 +33,6 @@ commands:
     description: Give a player a cheque
     usage: /cheque <amount>(all)
     aliases: [chk]
+  dbank:
+    description: Admin command
+    usage: /dbank subtract <player> <amount>(all) or /dbank transfer <source> <target> <amount>(all)

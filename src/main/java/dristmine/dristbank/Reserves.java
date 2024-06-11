@@ -6,12 +6,12 @@ import org.bukkit.command.CommandSender;
 
 public class Reserves implements CommandExecutor {
     private final DristBank plugin;
-    private final ConfigManager configManager;
+    private final StorageManager storageManager;
     private final MessageManager messageManager;
 
-    public Reserves(DristBank plugin, ConfigManager configManager, MessageManager messageManager) {
+    public Reserves(DristBank plugin, StorageManager storageManager, MessageManager messageManager) {
         this.plugin = plugin;
-        this.configManager = configManager;
+        this.storageManager = storageManager;
         this.messageManager = messageManager;
     }
 
@@ -27,7 +27,7 @@ public class Reserves implements CommandExecutor {
             return true;
         }
 
-        int totalDebris = configManager.getConfig().getInt("total_debris", 0);
+        int totalDebris = (int) storageManager.getTotalDebris();
         sender.sendMessage(messageManager.getMessage("reserves-success", totalDebris));
         return true;
     }
