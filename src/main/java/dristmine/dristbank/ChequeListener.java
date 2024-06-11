@@ -13,11 +13,13 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 public class ChequeListener implements Listener {
-    private final ConfigManager configManager;
+    private final DristBank plugin;
+    private final StorageManager storageManager;
     private final MessageManager messageManager;
 
-    public ChequeListener(DristBank dristBank, ConfigManager configManager, MessageManager messageManager) {
-        this.configManager = configManager;
+    public ChequeListener(DristBank plugin, StorageManager storageManager, MessageManager messageManager) {
+        this.plugin = plugin;
+        this.storageManager = storageManager;
         this.messageManager = messageManager;
     }
 
@@ -35,12 +37,11 @@ public class ChequeListener implements Listener {
         // Check if the paper item has a cheque value attached to it
         double chequeAmount = getChequeAmount(item);
         if (chequeAmount > 0) {
-            // Check player's balance
-            double currentBalance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
+            String playerUUID = player.getUniqueId().toString();
+            double currentBalance = storageManager.getBalance(playerUUID);
 
             // Add the cheque value to the player's balance
-            configManager.getConfig().set("player-info." + player.getUniqueId(), currentBalance + chequeAmount);
-            configManager.saveConfig();
+            storageManager.updateBalance(playerUUID, currentBalance + chequeAmount);
 
             // Subtract 1 from the player's item in hand
             if (item.getAmount() > 1) {
@@ -57,7 +58,7 @@ public class ChequeListener implements Listener {
     private double getChequeAmount(ItemStack item) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null && meta.hasDisplayName()) {
-            NamespacedKey key = new NamespacedKey(DristBank.getPlugin(DristBank.class), "cheque-value");
+            NamespacedKey key = new NamespacedKey(plugin, "cheque-value");
             PersistentDataContainer container = meta.getPersistentDataContainer();
             if (container.has(key, PersistentDataType.DOUBLE)) {
                 return container.get(key, PersistentDataType.DOUBLE);

@@ -58,6 +58,10 @@
           <id>sonatype</id>
           <url>https://oss.sonatype.org/content/groups/public/</url>
       </repository>
+      <repository>
+          <id>DristAlerts</id>
+          <url>https://raw.githubusercontent.com/RealKomander/DristAlerts/main/</url>
+      </repository>
   </repositories>
 
   <dependencies>
@@ -66,6 +70,11 @@
           <artifactId>paper-api</artifactId>
           <version>1.20.4-R0.1-SNAPSHOT</version>
           <scope>provided</scope>
+      </dependency>
+      <dependency>
+          <groupId>dristmine</groupId>
+          <artifactId>DristAlerts</artifactId>
+          <version>1.20.4</version>
       </dependency>
   </dependencies>
 </project>

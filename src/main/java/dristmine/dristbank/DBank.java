@@ -8,13 +8,13 @@ import org.slf4j.helpers.Util;
 
 public class DBank implements CommandExecutor {
 	private final DristBank plugin;
-	private final ConfigManager configManager;
 	private final MessageManager messageManager;
+	private final StorageManager storageManager;
 
-	public DBank(DristBank plugin, ConfigManager configManager, MessageManager messageManager) {
+	public DBank(DristBank plugin, StorageManager storageManager, MessageManager messageManager) {
 		this.plugin = plugin;
-		this.configManager = configManager;
 		this.messageManager = messageManager;
+		this.storageManager = storageManager;
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class DBank implements CommandExecutor {
 					return true;
 				}
 
-				amount = Utils.getBalance(target, configManager);
+				amount = storageManager.getBalance(target.getUniqueId().toString());
 			}
 
 			if (amount <= 0) {
@@ -91,7 +91,7 @@ public class DBank implements CommandExecutor {
 					return true;
 				}
 
-				amount = Utils.getBalance(source, configManager);
+				amount = storageManager.getBalance(source.getUniqueId().toString());
 			}
 
 			if (amount <= 0) {
@@ -108,23 +108,19 @@ public class DBank implements CommandExecutor {
 	}
 
 	private boolean subtract(Player target, double amount) {
-		double balance = Utils.getBalance(target, configManager);
+		double balance = storageManager.getBalance(target.getUniqueId().toString());
 
-		Utils.setBalance(target, balance - amount, configManager);
-
-		configManager.saveConfig();
+		storageManager.updateBalance(target.getUniqueId().toString(), balance - amount);
 
 		return true;
 	}
 
 	private boolean transfer(Player source, Player target, double amount) {
-		double sourceBalance = Utils.getBalance(source, configManager);
-		double targetBalance = Utils.getBalance(target, configManager);
+		double sourceBalance = storageManager.getBalance(source.getUniqueId().toString());
+		double targetBalance = storageManager.getBalance(target.getUniqueId().toString());
 
-		Utils.setBalance(source, sourceBalance - amount, configManager);
-		Utils.setBalance(target, targetBalance + amount, configManager);
-
-		configManager.saveConfig();
+		storageManager.updateBalance(source.getUniqueId().toString(), sourceBalance - amount);
+		storageManager.updateBalance(target.getUniqueId().toString(), targetBalance + amount);
 
 		return true;
 	}

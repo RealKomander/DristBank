@@ -4,15 +4,19 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import java.util.Map;
+
 public class Interest implements CommandExecutor {
     private final DristBank plugin;
     private final ConfigManager configManager;
     private final MessageManager messageManager;
+    private final StorageManager storageManager;
 
-    public Interest(DristBank plugin, ConfigManager configManager, MessageManager messageManager) {
+    public Interest(DristBank plugin, ConfigManager configManager, MessageManager messageManager, StorageManager storageManager) {
         this.plugin = plugin;
         this.configManager = configManager;
         this.messageManager = messageManager;
+        this.storageManager = storageManager;
     }
 
     @Override
@@ -38,18 +42,17 @@ public class Interest implements CommandExecutor {
             return;
         }
 
-        double totalDebris = configManager.getConfig().getDouble("total_debris", 0);
-
-        // Check if the configuration section exists
-        if (configManager.getConfig().contains("player-info")) {
-            // Retrieve keys only if the configuration section exists
-            for (String playerUUID : configManager.getConfig().getConfigurationSection("player-info").getKeys(false)) {
-                double balance = configManager.getConfig().getDouble("player-info." + playerUUID, 0);
-                double interest = balance * monthlyInterestRate / 100.0;
-                configManager.getConfig().set("player-info." + playerUUID, balance + interest);
-            }
+        double totalDebris = storageManager.getTotalDebris();
+        if (totalDebris <= 0) {
+            return;
         }
 
-        configManager.saveConfig();
+        Map<String, Double> balances = storageManager.getAllBalances();
+        for (Map.Entry<String, Double> entry : balances.entrySet()) {
+            String playerUUID = entry.getKey();
+            double balance = entry.getValue();
+            double interest = balance * monthlyInterestRate / 100.0;
+            storageManager.updateBalance(playerUUID, balance + interest);
+        }
     }
 }

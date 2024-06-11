@@ -7,12 +7,12 @@ import org.bukkit.entity.Player;
 
 public class Balance implements CommandExecutor {
     private final DristBank plugin;
-    private final ConfigManager configManager;
+    private final StorageManager storageManager;
     private final MessageManager messageManager;
 
-    public Balance(DristBank plugin, ConfigManager configManager, MessageManager messageManager) {
+    public Balance(DristBank plugin, StorageManager storageManager, MessageManager messageManager) {
         this.plugin = plugin;
-        this.configManager = configManager;
+        this.storageManager = storageManager;
         this.messageManager = messageManager;
     }
 
@@ -30,8 +30,9 @@ public class Balance implements CommandExecutor {
             return true;
         }
 
-        double balance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
-        String balanceMessage = messageManager.getMessage("balance-message", balance);
+        String playerUUID = player.getUniqueId().toString();
+        double balance = storageManager.getBalance(playerUUID);
+        String balanceMessage = messageManager.getMessage("balance-message", String.format("%.2f", balance));
         player.sendMessage(balanceMessage);
         return true;
     }

@@ -21,12 +21,12 @@ import java.util.List;
 
 public class Cheque implements CommandExecutor {
     private final DristBank plugin;
-    private final ConfigManager configManager;
+    private final StorageManager storageManager;
     private final MessageManager messageManager;
 
-    public Cheque(DristBank plugin, ConfigManager configManager, MessageManager messageManager) {
+    public Cheque(DristBank plugin, StorageManager storageManager, MessageManager messageManager) {
         this.plugin = plugin;
-        this.configManager = configManager;
+        this.storageManager = storageManager;
         this.messageManager = messageManager;
     }
 
@@ -38,15 +38,16 @@ public class Cheque implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        String playerName = player.getName();
 
         if (args.length != 1) {
             player.sendMessage(messageManager.getMessage("cheque-usage"));
             return true;
         }
 
-        double balance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
+        String playerUUID = player.getUniqueId().toString();
+        double balance = storageManager.getBalance(playerUUID);
         double amount;
+
         try {
             amount = Double.parseDouble(args[0]);
         } catch (NumberFormatException e) {
@@ -54,7 +55,6 @@ public class Cheque implements CommandExecutor {
                 player.sendMessage(messageManager.getMessage("invalid-amount"));
                 return true;
             }
-
             amount = balance;
         }
 
@@ -63,19 +63,13 @@ public class Cheque implements CommandExecutor {
             return true;
         }
 
-        if (!player.hasPermission("dristbank.admin")) {
-            if (balance < amount) {
-                player.sendMessage(messageManager.getMessage("insufficient-balance", balance));
-                return true;
-            }
-            // Subtract cheque amount from player's balance
-            configManager.getConfig().set("player-info." + player.getUniqueId(), balance - amount);
-            configManager.saveConfig();
-        } else if (player.hasPermission("dristbank.admin")) {
-            balance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
-            configManager.getConfig().set("player-info." + player.getUniqueId(), balance - amount);
-            configManager.saveConfig();
+        if (!player.hasPermission("dristbank.admin") && balance < amount) {
+            player.sendMessage(messageManager.getMessage("insufficient-balance", balance));
+            return true;
         }
+
+        // Subtract cheque amount from player's balance
+        storageManager.updateBalance(playerUUID, balance - amount);
 
         ItemStack cheque = createCheque(amount);
         Inventory playerInventory = player.getInventory();

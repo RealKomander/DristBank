@@ -5,22 +5,21 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull; // Import the @NotNull annotation
 
 import static dristmine.dristbank.Utils.itemGive;
 
 public class Take implements CommandExecutor {
-    private final DristBank plugin;
-    private final ConfigManager configManager;
     private final MessageManager messageManager;
+    private final StorageManager storageManager;
 
-    public Take(DristBank plugin, ConfigManager configManager, MessageManager messageManager) {
-        this.plugin = plugin;
-        this.configManager = configManager;
+    public Take(DristBank plugin, MessageManager messageManager, StorageManager storageManager) {
         this.messageManager = messageManager;
+        this.storageManager = storageManager;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(messageManager.getMessage("only-players"));
             return true;
@@ -38,17 +37,17 @@ public class Take implements CommandExecutor {
             return true;
         }
 
-        double balance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
+        double balance = storageManager.getBalance(player.getUniqueId().toString());
         double amount;
         try {
-            amount = Double.parseDouble(args[0]);
-        } catch (NumberFormatException e) {
-            if (!args[0].equalsIgnoreCase(Utils.MAX_AMOUNT_ARG)) {
-                player.sendMessage(messageManager.getMessage("invalid-amount"));
-                return true;
+            if (args[0].equalsIgnoreCase(Utils.MAX_AMOUNT_ARG)) {
+                amount = (int) balance;
+            } else {
+                amount = Double.parseDouble(args[0]);
             }
-
-            amount = balance;
+        } catch (NumberFormatException e) {
+            player.sendMessage(messageManager.getMessage("invalid-amount"));
+            return true;
         }
 
         if (amount <= 0) {
@@ -61,7 +60,7 @@ public class Take implements CommandExecutor {
             return true;
         }
 
-        int totalDebris = configManager.getConfig().getInt("total_debris", 0);
+        int totalDebris = (int) storageManager.getTotalDebris();
 
         if (totalDebris < amount) {
             player.sendMessage(messageManager.getMessage("insufficient-system-debris"));
@@ -70,9 +69,8 @@ public class Take implements CommandExecutor {
 
         itemGive(player, (int) amount, Material.ANCIENT_DEBRIS);
 
-        configManager.getConfig().set("player-info." + player.getUniqueId(), balance - amount);
-        configManager.getConfig().set("total_debris", totalDebris - amount);
-        configManager.saveConfig();
+        storageManager.updateBalance(player.getUniqueId().toString(), balance - amount);
+        storageManager.removeDebris(amount);
 
         player.sendMessage(messageManager.getMessage("take-success", amount));
         return true;

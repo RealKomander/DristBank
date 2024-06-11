@@ -1,0 +1,11 @@
+# DristBank Configuration
+
+last_month_paid_interest: 6
+total_debris: 13657
+monthly_interest_rate: 0.5
+
+database:
+  hostname: 127.0.0.1:3306
+  user: root
+  password:
+  database: minecraft

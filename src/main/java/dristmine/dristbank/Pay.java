@@ -9,11 +9,13 @@ public class Pay implements CommandExecutor {
     private final DristBank plugin;
     private final ConfigManager configManager;
     private final MessageManager messageManager;
+    private final StorageManager storageManager;
 
-    public Pay(DristBank plugin, ConfigManager configManager, MessageManager messageManager) {
+    public Pay(DristBank plugin, ConfigManager configManager, MessageManager messageManager, StorageManager storageManager) {
         this.plugin = plugin;
         this.configManager = configManager;
         this.messageManager = messageManager;
+        this.storageManager = storageManager;
     }
 
     @Override
@@ -47,7 +49,7 @@ public class Pay implements CommandExecutor {
             return true;
         }
 
-        double balance = configManager.getConfig().getDouble("player-info." + player.getUniqueId(), 0);
+        double balance = storageManager.getBalance(player.getUniqueId().toString());
         double amount;
         try {
             amount = Double.parseDouble(args[1]);
@@ -70,9 +72,8 @@ public class Pay implements CommandExecutor {
             return true;
         }
 
-        configManager.getConfig().set("player-info." + player.getUniqueId(), balance - amount);
-        configManager.getConfig().set("player-info." + target.getUniqueId(), configManager.getConfig().getDouble("player-info." + target.getUniqueId(), 0) + amount);
-        configManager.saveConfig();
+        storageManager.updateBalance(player.getUniqueId().toString(), balance - amount);
+        storageManager.updateBalance(target.getUniqueId().toString(), storageManager.getBalance(target.getUniqueId().toString()) + amount);
 
         String transferMessage = messageManager.getMessage("transfer-message", playerName, amount, target.getName());
         player.sendMessage(transferMessage);
